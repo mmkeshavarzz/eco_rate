@@ -5,354 +5,414 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>قیمت لحظه‌ای بازار</title>
 <style>
+:root {
+  --bg: oklch(97% 0.004 255);
+  --surface: oklch(100% 0 0);
+  --border: oklch(91% 0.006 255);
+  --text: oklch(16% 0.016 255);
+  --muted: oklch(53% 0.010 255);
+  --gold: oklch(63% 0.150 70);
+  --gold-bg: oklch(97% 0.022 70);
+  --silver: oklch(47% 0.011 255);
+  --silver-bg: oklch(96% 0.006 255);
+  --accent: oklch(51% 0.142 148);
+  --accent-bg: oklch(96% 0.036 148);
+  --danger: oklch(51% 0.162 25);
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) {
   :root {
-    --bg: oklch(97% 0.005 250);
-    --surface: oklch(100% 0 0);
-    --border: oklch(88% 0.01 250);
-    --text: oklch(18% 0.02 250);
-    --muted: oklch(52% 0.015 250);
-    --gold: oklch(68% 0.15 75);
-    --gold-light: oklch(96% 0.04 75);
-    --silver: oklch(55% 0.01 250);
-    --silver-light: oklch(95% 0.01 250);
-    --dollar: oklch(56% 0.14 145);
-    --dollar-light: oklch(95% 0.05 145);
-    --accent: oklch(56% 0.17 155);
-    --radius: 18px;
-    --radius-sm: 10px;
-    --shadow: 0 1px 4px oklch(18% 0.02 250/0.07), 0 6px 20px oklch(18% 0.02 250/0.05);
+    --bg: oklch(13% 0.006 255);
+    --surface: oklch(18% 0.007 255);
+    --border: oklch(27% 0.007 255);
+    --text: oklch(93% 0.004 255);
+    --muted: oklch(59% 0.008 255);
+    --gold: oklch(73% 0.138 70);
+    --gold-bg: oklch(21% 0.028 70);
+    --silver: oklch(69% 0.009 255);
+    --silver-bg: oklch(21% 0.005 255);
+    --accent: oklch(66% 0.128 148);
+    --accent-bg: oklch(19% 0.038 148);
+    --danger: oklch(66% 0.138 25);
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 40px 16px 60px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: Tahoma, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 36px 16px 56px;
+}
+.wrap { max-width: 880px; margin: 0 auto; }
+h1 {
+  text-align: center;
+  font-size: clamp(1.25rem, 3vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-bottom: 4px;
+}
+.sub {
+  text-align: center;
+  color: var(--muted);
+  font-size: .82rem;
+  margin-bottom: 6px;
+}
+.src-line {
+  text-align: center;
+  font-size: .72rem;
+  color: var(--muted);
+  min-height: 1.1rem;
+  margin-bottom: 28px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 22px 18px 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 14px rgba(0,0,0,.05);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0,0,0,.06), 0 8px 20px rgba(0,0,0,.08);
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: var(--r) var(--r) 0 0;
+}
+.card.gold::before   { background: var(--gold); }
+.card.silver::before { background: var(--silver); }
+.card.dollar::before { background: var(--accent); }
+.ico {
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem;
+  margin-bottom: 12px;
+}
+.gold .ico   { background: var(--gold-bg); }
+.silver .ico { background: var(--silver-bg); }
+.dollar .ico { background: var(--accent-bg); }
+.lbl { font-size: .76rem; color: var(--muted); font-weight: 500; margin-bottom: 8px; }
+.price-row { display: flex; align-items: baseline; gap: 5px; min-height: 2.1rem; }
+.price { font-size: .76rem; color: var(--muted); font-weight: 500; margin-bottom: 8px; }
+.price-row { display: flex; align-items: baseline; gap: 5px; min-height: 2.1rem; }
+.price {r: var(--silver); }
+.dollar .price { color: var(--accent); }
+.unit { font-size: .72rem; color: var(--muted); padding-bottom: 2px; }
+.badge {
+  display: inline-flex; align-items: center; gap: 2px;
+  font-size: .68rem; font-weight: 600;
+  padding: 2px 7px; border-radius: 20px;
+  margin-top: 6px;
+  visibility: hidden;
+}
+.badge.show { visibility: visible; }
+.badge.up { background: oklch(92% .048 148); color: var(--accent); }
+.badge.dn { background: oklch(95% .048 25);  color: var(--danger); }
+@media (prefers-color-scheme: dark) {
+  .badge.up { background: oklch(22% .058 148); }
+  .badge.dn { background: oklch(22% .058 25); }
+}
+.sep { height: 1px; background: var(--border); margin: 12px 0 8px; }
+.meta { font-size: .7rem; color: var(--muted); min-height: 1rem; }
+.sk {
+  display: inline-block; width: 115px; height: 1.85rem;
+  background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px; vertical-align: bottom;
+}
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .sk, .dot { animation: none; } }
+.footer {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.ts { font-size: .76rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+.btn {
+  background: var(--accent); color: oklch(98% 0 0);
+  border: none; border-radius: 9px;
+  padding: 10px 22px;
+  font-size: .83rem; font-weight: 600; font-family: inherit;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: opacity .15s, transform .1s;
+}
+.btn:hover { opacity: .85; }
+.btn:active { transform: scale(.97); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+#errBox {
+  background: oklch(97% .022 25);
+  border: 1px solid oklch(88% .055 25);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: .8rem; color: oklch(36% .115 25);
+  line-height: 1.7;
+  margin-bottom: 20px;
+  display: none;
+}
+@media (prefers-color-scheme: dark) {
+  #errBox {
+    background: oklch(20% .038 25);
+    border-color: oklch(31% .075 25);
+    color: oklch(73% .115 25);
   }
-  header { text-align: center; margin-bottom: 40px; }
-  header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.02em; }
-  header p { color: var(--muted); font-size: 0.9rem; margin-top: 6px; }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-    gap: 20px;
-    max-width: 900px;
-    margin: 0 auto 32px;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 28px 24px 22px;
-    box-shadow: var(--shadow);
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.15s ease;
-  }
-  .card:hover { transform: translateY(-2px); }
-  .card::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 3px;
-    border-radius: var(--radius) var(--radius) 0 0;
-  }
-  .card.gold::before { background: var(--gold); }
-  .card.silver::before { background: var(--silver); }
-  .card.dollar::before { background: var(--dollar); }
-
-  .icon {
-    width: 50px; height: 50px;
-    border-radius: var(--radius-sm);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.5rem;
-    margin-bottom: 16px;
-  }
-  .card.gold .icon { background: var(--gold-light); }
-  .card.silver .icon { background: var(--silver-light); }
-  .card.dollar .icon { background: var(--dollar-light); }
-
-  .label { font-size: 0.82rem; color: var(--muted); font-weight: 500; margin-bottom: 8px; }
-
-  .price {
-    font-size: 1.9rem;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.03em;
-    line-height: 1;
-    min-height: 2rem;
-    transition: opacity 0.3s;
-  }
-  .card.gold .price { color: var(--gold); }
-  .card.silver .price { color: var(--silver); }
-  .card.dollar .price { color: var(--dollar); }
-
-  .unit { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
-  .divider { height: 1px; background: var(--border); margin: 14px 0; }
-  .source { font-size: 0.75rem; color: var(--muted); }
-
-  .change {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    padding: 2px 7px;
-    border-radius: 20px;
-    margin-top: 6px;
-  }
-  .change.up { background: oklch(93% 0.06 145); color: oklch(40% 0.15 145); }
-  .change.down { background: oklch(95% 0.05 25); color: oklch(40% 0.15 25); }
-  .change.flat { background: var(--border); color: var(--muted); }
-
-  .skeleton {
-    height: 1.9rem; width: 65%;
-    background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.3s infinite;
-    border-radius: 6px;
-  }
-  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-
-  .footer {
-    max-width: 900px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .ts { font-size: 0.8rem; color: var(--muted); }
-
-  .btn {
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 10px 22px;
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    transition: opacity 0.15s, transform 0.1s;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .btn:hover { opacity: 0.88; }
-  .btn:active { transform: scale(0.97); }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .info {
-    max-width: 900px;
-    margin: 0 auto 24px;
-    background: oklch(97% 0.03 230);
-    border: 1px solid oklch(88% 0.04 230);
-    border-radius: var(--radius-sm);
-    padding: 13px 16px;
-    font-size: 0.83rem;
-    color: oklch(40% 0.08 230);
-    line-height: 1.6;
-  }
-
-  .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: oklch(60% 0.18 145);
-    display: inline-block;
-    animation: pulse 2s infinite;
-    margin-left: 4px;
-  }
-  @keyframes pulse {
-    0%,100%{opacity:1;transform:scale(1)}
-    50%{opacity:0.4;transform:scale(0.85)}
-  }
-
-  @media(max-width:480px){
-    header h1{font-size:1.45rem;}
-    .price{font-size:1.55rem;}
-  }
+}
 </style>
 </head>
 <body>
-
-<header>
+<div class="wrap">
   <h1>📊 قیمت لحظه‌ای بازار</h1>
-  <p>طلا · نقره · دلار — همه به ریال</p>
-</header>
-
-<div class="info" id="infoBox">
-  ℹ️ داده‌ها از API عمومی <strong>TGJU</strong> (tgju.org) دریافت می‌شوند که بدون نیاز به proxy قابل دسترسی است.
-</div>
-
-<div class="grid">
-  <div class="card gold">
-    <div class="icon">🥇</div>
-    <div class="label">قیمت هر میلی‌گرم طلا ۱۸ عیار</div>
-    <div class="price" id="goldPrice"><div class="skeleton"></div></div>
-    <div class="change flat" id="goldChange" style="display:none"></div>
-    <div class="unit">ریال · منبع: TGJU</div>
-    <div class="divider"></div>
-    <div class="source" id="goldTime">در حال دریافت...</div>
+  <p class="sub">طلا · نقره · دلار — به‌روزرسانی خودکار هر ۶۰ ثانیه</p>
+  <p class="src-line" id="srcLine"></p>
+  <div id="errBox" role="alert"></div>
+  <div class="grid">
+    <div class="card gold">
+      <div class="ico" aria-hidden="true">🥇</div>
+      <div class="lbl">هر میلی‌گرم طلا ۱۸ عیار</div>
+      <div class="price-row">
+        <span class="price" id="gp" aria-live="polite"><span class="sk"></span></span>
+        <span class="unit">ریال</span>
+      </div>
+      <div class="badge" id="gb" aria-live="polite"></div>
+      <div class="sep"></div>
+      <div class="meta" id="gm">در حال دریافت...</div>
+    </div>
+    <div class="card silver">
+      <div class="ico" aria-hidden="true">🥈</div>
+      <div class="lbl">هر میلی‌گرم نقره</div>
+      <div class="price-row">
+        <span class="price" id="sp" aria-live="polite"><span class="sk"></span></span>
+        <span class="unit">ریال</span>
+      </div>
+      <div class="badge" id="sb" aria-live="polite"></div>
+      <div class="sep"></div>
+      <div class="meta" id="sm">در حال دریافت...</div>
+    </div>
+    <div class="card dollar">
+      <div class="ico" aria-hidden="true">💵</div>
+      <div class="lbl">دلار آمریکا (بازار آزاد)</div>
+      <div class="price-row">
+        <span class="price" id="dp" aria-live="polite"><span class="sk"></span></span>
+        <span class="unit">ریال</span>
+      </div>
+      <div class="badge" id="db" aria-live="polite"></div>
+      <div class="sep"></div>
+      <div class="meta" id="dm">در حال دریافت...</div>
+    </div>
   </div>
-
-  <div class="card silver">
-    <div class="icon">🥈</div>
-    <div class="label">قیمت هر میلی‌گرم نقره</div>
-    <div class="price" id="silverPrice"><div class="skeleton"></div></div>
-    <div class="change flat" id="silverChange" style="display:none"></div>
-    <div class="unit">ریال · منبع: TGJU</div>
-    <div class="divider"></div>
-    <div class="source" id="silverTime">در حال دریافت...</div>
+  <div class="footer">
+    <div class="ts">
+      <span class="dot" aria-hidden="true"></span>
+      <span id="ts">هنوز به‌روزرسانی نشده</span>
+    </div>
+    <button class="btn" id="refreshBtn" onclick="fetchAll()">🔄 به‌روزرسانی</button>
   </div>
-
-  <div class="card dollar">
-    <div class="icon">💵</div>
-    <div class="label">قیمت دلار آمریکا (بازار آزاد)</div>
-    <div class="price" id="dollarPrice"><div class="skeleton"></div></div>
-    <div class="change flat" id="dollarChange" style="display:none"></div>
-    <div class="unit">ریال · منبع: TGJU</div>
-    <div class="divider"></div>
-    <div class="source" id="dollarTime">در حال دریافت...</div>
-  </div>
-</div>
-
-<div class="footer">
-  <span class="ts" id="lastUpdate"><span class="dot"></span> هنوز به‌روزرسانی نشده</span>
-  <button class="btn" id="refreshBtn" onclick="fetchAll()">🔄 به‌روزرسانی</button>
 </div>
 
 <script>
-  // TGJU public API — no CORS issues
-  const TGJU_BASE = 'https://api.tgju.org/v1/market/indicator/summary-table-data/';
+var prevVals = {};
+var autoTimer = null;
+var INTERVAL = 60000;
 
-  const ITEMS = {
-    gold:   { key: 'sekeb',    label: 'گرم طلا ۱۸ عیار', divisor: 1000 },  // per gram -> /1000 for mg
-    silver: { key: 'silver',   label: 'نقره', divisor: 1000 },
-    dollar: { key: 'price_dollar_rl', label: 'دلار', divisor: 1 }
+function fmt(n) {
+  return Number(n).toLocaleString('fa-IR');
+}
+function nowStr() {
+  return new Date().toLocaleTimeString('fa-IR');
+}
+function setLoading() {
+  ['g','s','d'].forEach(function(k) {
+    document.getElementById(k+'p').innerHTML = '<span class="sk"></span>';
+    document.getElementById(k+'b').className = 'badge';
+    document.getElementById(k+'m').textContent = 'در حال دریافت...';
+  });
+  document.getElementById('errBox').style.display = 'none';
+  document.getElementById('srcLine').textContent = '';
+  document.getElementById('refreshBtn').disabled = true;
+}
+function renderCard(key, val) {
+  var pv = prevVals[key];
+  prevVals[key] = val;
+  document.getElementById(key+'p').textContent = fmt(val);
+  document.getElementById(key+'m').textContent = nowStr();
+  var badge = document.getElementById(key+'b');
+  if (pv !== undefined && pv !== val) {
+    var d = val - pv;
+    var pct = Math.abs(d / pv * 100).toFixed(2);
+    badge.className = 'badge show ' + (d > 0 ? 'up' : 'dn');
+    badge.textContent = (d > 0 ? '▲ ' : '▼ ') + fmt(Math.abs(d)) + ' (' + pct + '%)';
+  } else {
+    badge.className = 'badge';
+  }
+}
+function renderFail(key) {
+  document.getElementById(key+'p').textContent = '—';
+  document.getElementById(key+'m').textContent = 'داده دریافت نشد';
+}
+function showErr(html) {
+  var el = document.getElementById('errBox');
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
+
+// ─── CORS proxy: adds Access-Control headers, works from file:// too ───────
+function proxied(url) {
+  var p = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
+  return fetch(p, { signal: AbortSignal.timeout(13000) })
+    .then(function(r) {
+      if (!r.ok) throw new Error('proxy ' + r.status);
+      return r.json();
+    })
+    .then(function(j) {
+      if (!j || !j.contents) throw new Error('proxy empty');
+      return JSON.parse(j.contents);
+    });
+}
+
+// ─── Helper: pull numeric price out of TGJU's varied response shapes ────────
+function parseTGJU(data) {
+  if (!data) return null;
+  // shape 1: {data:{p:"1,234,567"}}
+  var d = data.data || data;
+  var raw = null;
+  if (d && d.p) {
+    raw = d.p;
+  } else {
+    // shape 2: nested somewhere — do a string search
+    var m = JSON.stringify(data).match(/"p"\s*:\s*"?([\d,]+)"?/);
+    if (m) raw = m[1];
+  }
+  if (!raw) return null;
+  return parseInt(String(raw).replace(/[^0-9]/g, ''), 10) || null;
+}
+
+// ─── Source A: tgju.org ─────────────────────────────────────────────────────
+function fromTGJU() {
+  var urls = {
+    g: 'https://api.tgju.org/v1/market/indicator/summary-table-data/sekeb',
+    s: 'https://api.tgju.org/v1/market/indicator/summary-table-data/silver',
+    d: 'https://api.tgju.org/v1/market/indicator/summary-table-data/price_dollar_rl'
   };
+  var jobs = Object.keys(urls).map(function(k) {
+    return proxied(urls[k])
+      .then(function(data) { return { k: k, data: data }; })
+      .catch(function() { return { k: k, data: null }; });
+  });
+  return Promise.all(jobs).then(function(results) {
+    var gold = null, silver = null, dollar = null;
+    results.forEach(function(r) {
+      var v = parseTGJU(r.da(r) {
+      var v = parseTGJU(r.data);
+      if (!v) return;
+      if (r.k === 'g') gold   = Math.round(v / 1000);
+      if (r.k === 's') silver = Math.round(v / 1000);
+      if (if (!gold && !silver && !dollar) throw new Error('tgju: no data');
+    return { gold: gold, silver: silver, dollar: dollar, src: 'tgju.org' };
+  });
+}
 
-  let prevPrices = {};
-
-  function fa(n) {
-    return Number(n).toLocaleString('fa-IR');
-  }
-
-  function setSkeletons() {
-    ['goldPrice','silverPrice','dollarPrice'].forEach(id => {
-      document.getElementById(id).innerHTML = '<div class="skeleton"></div>';
+// ─── Source B: navasan.tech ──────────────────────────────────────────────────
+function fromNavasan() {
+  var url = 'https://navasan.tech/api/?api_key=free&item=gold_18,silver,usd_buy';
+  return proxied(url).then(function(data) {
+    var gold = null, silver = null, dollar = null;
+    var items = Array.isArray(data) ? data : Object.values(data);
+    items.forEach(function(item) {
+      if (!item) return;
+      var raw = item.value || item.price || item.p || '';
+      var v = parseInt(String(raw).replace(/[^0-9]/g, ''), 10);
+      if (!v) return;
+      var slug = String(item.slug || item.name || item.title || '').toLowerCase();
+      if (slug.indexOf('gold') !== -1 || slug.indexOf('طلا') !== -1)   gold   = Math.round(v / 1000);
+      else if (slug.indexOf('silver') !== -1 || slug.indexOf('نقره') !== -1) silver = Math.round(v / 1000);
+      else if (slug.indexOf('usd') !== -1 || slug.indexOf('دلار') !== -1)    dollar = v;
     });
-    ['goldChange','silverChange','dollarChange'].forEach(id => {
-      document.getElementById(id).style.display = 'none';
+    if (!gold && !silver && !dollar) throw new Error('navasan: no data');
+    return { gold: gold, silver: silver, dollar: dollar, src: 'navasan.tech' };
+  });
+}
+
+// ─── Source C: alanchand.com ─────────────────────────────────────────────────
+function fromAlanChand() {
+  var url = 'https://alanchand.com/api/gold-price';
+  return proxied(url).then(function(data) {
+    var gold = null, silver = null, dollar = null;
+    var src = data.result || data.data || data;
+    if (Array.isArray(src)) {
+      src.forEach(function(item) {
+        var v = parseInt(String(item.price || item.value || '').replace(/[^0-9]/g,''), 10);
+        if (!v) return;
+        var t = String(item.type || item.name || item.slug || '').toLowerCase();
+        if (t.indexOf('18') !== -1 && (t.indexOf('gold') !== -1 || t.indexOf('طلا') !== -1)) gold = Math.round(v / 1000);
+        else if (t.indexOf('silver') !== -1 || t.indexOf('نقره') !== -1) silver = Math.round(v / 1000);
+        else if (t.indexOf('usd') !== -1 || t.indexOf('dollar') !== -1 || t.indexOf('دلار') !== -1) dollar = v;
+      });
+    }
+    if (!gold && !silver && !dollar) throw new Error('alanchand: no data');
+    return { gold: gold, silver: silver, dollar: dollar, src: 'alanchand.com' };
+  });
+}
+
+// ─── Fetch with ordered fallback ─────────────────────────────────────────────
+function fetchWithFallback() {
+  return fromTGJU()
+    .catch(function() { return fromNavasan(); })
+    .catch(function() { return fromAlanChand(); });
+}
+
+// ─── Main entry ──────────────────────────────────────────────────────────────
+function fetchAll() {
+  setLoading();
+  if (autoTimer) clearTimeout(autoTimer);
+
+  fetchWithFallback()
+    .then(function(res) {
+      if (res.gold)   renderCard('g', res.gold);   else renderFail('g');
+      if (res.silver) renderCard('s', res.silver); else renderFail('s');
+      if (res.dollar) renderCard('d', res.dollar); else renderFail('d');
+
+      document.getElementById('srcLine').textContent = 'منبع: ' + res.src;g','s','d'].forEach(renderFail);
+      document.getElementById‌روزرسانی: ' + nowStr();
+      document.getElementById('refreshBtn').disabled = false;
+
+      autoTimer = setTimeout(fetchAll, INTERVAL);
+    })
+    .catch(function(err) {
+      ['g','s','d'].forEach(renderFail);
+      document.getElementById('refreshBtn').disabled = false;
+      showErr(
+        '<strong>⚠️ خطا در دریافت داده از همه منابع</strong><br>' +
+        'جزئیات: ' + err.message + '<br><br>' +
+        'اگر فایل را مستقیم باز کرده‌اید، لطفاً آن را روی یک سرور اجرا کنید:<br>' +
+        '<code>python -m http.server 8080</code>'
+      );
+      autoTimer = setTimeout(fetchAll, INTERVAL);
     });
-  }
+}
 
-  function renderChange(elId, current, previous) {
-    const el = document.getElementById(elId);
-    if (!previous || previous === current) {
-      el.style.display = 'none';
-      return;
-    }
-    const diff = current - previous;
-    const pct = ((diff / previous) * 100).toFixed(2);
-    el.style.display = 'inline-flex';
-    if (diff > 0) {
-      el.className = 'change up';
-      el.textContent = `▲ ${fa(diff)} (${pct}%)`;
-    } else {
-      el.className = 'change down';
-      el.textContent = `▼ ${fa(Math.abs(diff))} (${Math.abs(pct)}%)`;
-    }
-  }
-
-  async function fetchTGJU(key) {
-    const url = `${TGJU_BASE}${key}`;
-    const res = await fetch(url, {
-      headers: { 'Accept': 'application/json' },
-      signal: AbortSignal.timeout(10000)
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  }
-
-  function extractPrice(data) {
-    // TGJU returns {data: {p: "price_string", ...}} or similar
-    try {
-      const d = data.data || data;
-      // Try common fields
-      const raw = d.p || d.price || d.last || d.value || d[0]?.p;
-      if (raw) {
-        return parseInt(String(raw).replace(/[,،\s]/g, ''));
-      }
-      // Sometimes it's nested deeper
-      if (Array.isArray(d) && d.length > 0) {
-        const v = d[0].p || d[0].price || d[0].value;
-        return parseInt(String(v).replace(/[,،\s]/g, ''));
-      }
-    } catch(e) {}
-    return null;
-  }
-
-  async function fetchmes it's nested deeper
-      if (Array.isArray(d) && d.length > 0) {
-        const v = d[0].p || d[0].price || d[0].value;
-        return parseInt(String(v).replace(/[,،\s]/g, ''));
-      }
-    } catch(e) {}
-    return null;
-  }
-
-  async function fetchback: search entire JSON for a number in plausible range
-        const str = JSON.stringify(data);
-        const matches = [...str.matchAll(/[":,\[](\d{5,8})[",\]]/g)];
-        for (const m of matches) {
-          const n = parseInt(m[1]);
-          if (type === 'dollar' && n > 300000 && n < 3000000) { price = n; break; }
-          if (type !== 'dollar' && n > 500000) { price = n; break; }
-        }
-      }
-
-      if (price) {
-        const displayPrice = item.divisor > 1 ? Math.round(price / item.divisor) : price;
-        const prev = prevPrices[type];
-        document.getElementById(priceElId).textContent = fa(displayPrice);
-        renderChange(changeElId, displayPrice, prev);
-        prevPrices[type] = displayPrice;
-        document.getElementById(timeElId).textContent =
-          `TGJU · ${new Date().toLocaleTimeString('fa-IR')}`;
-      } else {
-        document.getElementById(priceElId).textContent = '— (یافت نشد)';
-        document.getElementById(timeElId).textContent = 'پردازش داده ناموفق';
-      }
-    } catch(e) {
-      document.getElementById(priceElId).textContent = '— (خطا)';
-      document.getElementById(timeElId).textContent = 'خطا: ' + (e.message || 'نامشخص');
-    }
-  }
-
-  async function fetchAll() {
-    const btn = document.getElementById('refreshBtn');
-    btn.disabled = true;
-    btn.textContent = '⏳ دریافت...';
-    setSkeletons();
-
-    await Promise.all([
-      fetchSingle('gold',   'goldPrice',   'goldTime',   'goldChange'),
-      fetchSingle('silver', 'silverPrice', 'silverTime', 'silverChange'),
-      fetchSingle('dollar', 'dollarPrice', 'dollarTime', 'dollarChange'),
-    ]);
-
-    document.getElementById('lastUpdate').innerHTML =
-      `<span class="dot"></span> آخرین به‌روزرسانی: ${new Date().toLocaleString('fa-IR')}`;
-
-    btn.disabled = false;
-    btn.textContent = '🔄 به‌روزرسانی';
-  }
-
-  fetchAll();
-  setInterval(fetchAll, 60000);
+fetchAll();
 </script>
 </body>
 </html>
