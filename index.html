@@ -3,220 +3,176 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>قیمت لحظه‌ای طلا، نقره و دلار</title>
+<title>قیمت لحظه‌ای بازار</title>
 <style>
   :root {
     --bg: oklch(97% 0.005 250);
     --surface: oklch(100% 0 0);
-    --surface-raised: oklch(99% 0.004 250);
     --border: oklch(88% 0.01 250);
     --text: oklch(18% 0.02 250);
     --muted: oklch(52% 0.015 250);
-    --accent: oklch(58% 0.18 160);
-    --accent-light: oklch(94% 0.06 160);
-    --gold: oklch(72% 0.14 80);
-    --gold-light: oklch(96% 0.05 80);
-    --silver: oklch(62% 0.01 250);
+    --gold: oklch(68% 0.15 75);
+    --gold-light: oklch(96% 0.04 75);
+    --silver: oklch(55% 0.01 250);
     --silver-light: oklch(95% 0.01 250);
-    --dollar: oklch(58% 0.16 140);
-    --dollar-light: oklch(94% 0.06 140);
-    --radius-sm: 8px;
-    --radius-md: 14px;
-    --radius-lg: 20px;
-    --shadow: 0 1px 3px oklch(18% 0.02 250 / 0.08), 0 4px 16px oklch(18% 0.02 250 / 0.05);
+    --dollar: oklch(56% 0.14 145);
+    --dollar-light: oklch(95% 0.05 145);
+    --accent: oklch(56% 0.17 155);
+    --radius: 18px;
+    --radius-sm: 10px;
+    --shadow: 0 1px 4px oklch(18% 0.02 250/0.07), 0 6px 20px oklch(18% 0.02 250/0.05);
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: 'Segoe UI', Tahoma, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    padding: 32px 16px;
+    padding: 40px 16px 60px;
   }
-
-  header {
-    text-align: center;
-    margin-bottom: 40px;
-  }
-
-  header h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.02em;
-  }
-
-  header p {
-    color: var(--muted);
-    font-size: 0.9rem;
-    margin-top: 6px;
-  }
+  header { text-align: center; margin-bottom: 40px; }
+  header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.02em; }
+  header p { color: var(--muted); font-size: 0.9rem; margin-top: 6px; }
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
     gap: 20px;
-    max-width: 960px;
+    max-width: 900px;
     margin: 0 auto 32px;
   }
 
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 28px 24px;
+    border-radius: var(--radius);
+    padding: 28px 24px 22px;
     box-shadow: var(--shadow);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
     position: relative;
     overflow: hidden;
+    transition: transform 0.15s ease;
   }
-
-  .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 6px oklch(18% 0.02 250 / 0.1), 0 8px 24px oklch(18% 0.02 250 / 0.08);
-  }
-
+  .card:hover { transform: translateY(-2px); }
   .card::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    inset: 0 0 auto 0;
+    height: 3px;
+    border-radius: var(--radius) var(--radius) 0 0;
   }
-
   .card.gold::before { background: var(--gold); }
   .card.silver::before { background: var(--silver); }
   .card.dollar::before { background: var(--dollar); }
 
-  .card-icon {
-    width: 52px; height: 52px;
-    border-radius: var(--radius-md);
+  .icon {
+    width: 50px; height: 50px;
+    border-radius: var(--radius-sm);
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     margin-bottom: 16px;
   }
+  .card.gold .icon { background: var(--gold-light); }
+  .card.silver .icon { background: var(--silver-light); }
+  .card.dollar .icon { background: var(--dollar-light); }
 
-  .card.gold .card-icon { background: var(--gold-light); }
-  .card.silver .card-icon { background: var(--silver-light); }
-  .card.dollar .card-icon { background: var(--dollar-light); }
+  .label { font-size: 0.82rem; color: var(--muted); font-weight: 500; margin-bottom: 8px; }
 
-  .card-label {
-    font-size: 0.85rem;
-    color: var(--muted);
-    font-weight: 500;
-    margin-bottom: 8px;
-  }
-
-  .card-price {
-    font-size: 1.8rem;
+  .price {
+    font-size: 1.9rem;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    min-height: 2.2rem;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    min-height: 2rem;
+    transition: opacity 0.3s;
   }
+  .card.gold .price { color: var(--gold); }
+  .card.silver .price { color: var(--silver); }
+  .card.dollar .price { color: var(--dollar); }
 
-  .card.gold .card-price { color: var(--gold); }
-  .card.silver .card-price { color: var(--silver); }
-  .card.dollar .card-price { color: var(--dollar); }
+  .unit { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+  .divider { height: 1px; background: var(--border); margin: 14px 0; }
+  .source { font-size: 0.75rem; color: var(--muted); }
 
-  .card-unit {
-    font-size: 0.8rem;
-    color: var(--muted);
+  .change {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
     margin-top: 6px;
   }
-
-  .card-source {
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid var(--border);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+  .change.up { background: oklch(93% 0.06 145); color: oklch(40% 0.15 145); }
+  .change.down { background: oklch(95% 0.05 25); color: oklch(40% 0.15 25); }
+  .change.flat { background: var(--border); color: var(--muted); }
 
   .skeleton {
+    height: 1.9rem; width: 65%;
     background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
     background-size: 200% 100%;
-    animation: shimmer 1.4s infinite;
+    animation: shimmer 1.3s infinite;
     border-radius: 6px;
-    height: 1.8rem;
-    width: 70%;
   }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-  @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-
-  .status-bar {
-    max-width: 960px;
+  .footer {
+    max-width: 900px;
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
   }
+  .ts { font-size: 0.8rem; color: var(--muted); }
 
-  .last-update {
-    font-size: 0.82rem;
-    color: var(--muted);
-  }
-
-  .refresh-btn {
+  .btn {
     background: var(--accent);
-    color: white;
+    color: #fff;
     border: none;
     border-radius: var(--radius-sm);
-    padding: 9px 20px;
+    padding: 10px 22px;
     font-size: 0.88rem;
     font-weight: 600;
     cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
     font-family: inherit;
+    transition: opacity 0.15s, transform 0.1s;
+    display: flex; align-items: center; gap: 6px;
   }
+  .btn:hover { opacity: 0.88; }
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .refresh-btn:hover { opacity: 0.88; }
-  .refresh-btn:active { transform: scale(0.97); }
-  .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .error-banner {
-    background: oklch(96% 0.04 25);
-    border: 1px solid oklch(88% 0.08 25);
-    color: oklch(40% 0.12 25);
-    border-radius: var(--radius-md);
-    padding: 14px 18px;
-    font-size: 0.88rem;
-    max-width: 960px;
-    margin: 0 auto 20px;
-    display: none;
-  }
-
-  .note-banner {
-    background: oklch(96% 0.04 250);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 14px 18px;
-    font-size: 0.85rem;
-    color: var(--muted);
-    max-width: 960px;
+  .info {
+    max-width: 900px;
     margin: 0 auto 24px;
-    line-height: 1.7;
+    background: oklch(97% 0.03 230);
+    border: 1px solid oklch(88% 0.04 230);
+    border-radius: var(--radius-sm);
+    padding: 13px 16px;
+    font-size: 0.83rem;
+    color: oklch(40% 0.08 230);
+    line-height: 1.6;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .skeleton { animation: none; }
-    .card { transition: none; }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: oklch(60% 0.18 145);
+    display: inline-block;
+    animation: pulse 2s infinite;
+    margin-left: 4px;
+  }
+  @keyframes pulse {
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:0.4;transform:scale(0.85)}
   }
 
-  @media (max-width: 480px) {
-    header h1 { font-size: 1.4rem; }
-    .card-price { font-size: 1.5rem; }
+  @media(max-width:480px){
+    header h1{font-size:1.45rem;}
+    .price{font-size:1.55rem;}
   }
 </style>
 </head>
@@ -227,233 +183,176 @@
   <p>طلا · نقره · دلار — همه به ریال</p>
 </header>
 
-<div class="note-banner" id="noteBanner">
-  ⚠️ به دلیل محدودیت CORS مرورگر، داده‌ها مستقیماً از سایت‌های مقصد قابل دریافت نیستند. از proxy عمومی استفاده می‌شود. اگر داده‌ها لود نشدند، می‌توانید قیمت‌ها را دستی وارد کنید یا از یک backend ساده (Node/Python) استفاده کنید.
+<div class="info" id="infoBox">
+  ℹ️ داده‌ها از API عمومی <strong>TGJU</strong> (tgju.org) دریافت می‌شوند که بدون نیاز به proxy قابل دسترسی است.
 </div>
-
-<div class="error-banner" id="errorBanner"></div>
 
 <div class="grid">
-
-  <!-- طلا -->
   <div class="card gold">
-    <div class="card-icon">🥇</div>
-    <div class="card-label">قیمت هر میلی‌گرم طلا</div>
-    <div class="card-price" id="goldPrice"><div class="skeleton"></div></div>
-    <div class="card-unit">ریال · منبع: دیجی‌کالا</div>
-    <div class="card-source" id="goldSource">در حال بارگذاری...</div>
+    <div class="icon">🥇</div>
+    <div class="label">قیمت هر میلی‌گرم طلا ۱۸ عیار</div>
+    <div class="price" id="goldPrice"><div class="skeleton"></div></div>
+    <div class="change flat" id="goldChange" style="display:none"></div>
+    <div class="unit">ریال · منبع: TGJU</div>
+    <div class="divider"></div>
+    <div class="source" id="goldTime">در حال دریافت...</div>
   </div>
 
-  <!-- نقره -->
   <div class="card silver">
-    <div class="card-icon">🥈</div>
-    <div class="card-label">قیمت هر میلی‌گرم نقره</div>
-    <div class="card-price" id="silverPrice"><div class="skeleton"></div></div>
-    <div class="card-unit">ریال · منبع: دیجی‌کالا</div>
-    <div class="card-source" id="silverSource">در حال بارگذاری...</div>
+    <div class="icon">🥈</div>
+    <div class="label">قیمت هر میلی‌گرم نقره</div>
+    <div class="price" id="silverPrice"><div class="skeleton"></div></div>
+    <div class="change flat" id="silverChange" style="display:none"></div>
+    <div class="unit">ریال · منبع: TGJU</div>
+    <div class="divider"></div>
+    <div class="source" id="silverTime">در حال دریافت...</div>
   </div>
 
-  <!-- دلار -->
   <div class="card dollar">
-    <div class="card-icon">💵</div>
-    <div class="card-label">قیمت دلار آمریکا</div>
-    <div class="card-price" id="dollarPrice"><div class="skeleton"></div></div>
-    <div class="card-unit">ریال · منبع: iSignal</div>
-    <div class="card-source" id="dollarSource">در حال بارگذاری...</div>
+    <div class="icon">💵</div>
+    <div class="label">قیمت دلار آمریکا (بازار آزاد)</div>
+    <div class="price" id="dollarPrice"><div class="skeleton"></div></div>
+    <div class="change flat" id="dollarChange" style="display:none"></div>
+    <div class="unit">ریال · منبع: TGJU</div>
+    <div class="divider"></div>
+    <div class="source" id="dollarTime">در حال دریافت...</div>
   </div>
-
 </div>
 
-<div class="status-bar">
-  <span class="last-update" id="lastUpdate">هنوز به‌روزرسانی نشده</span>
-  <button class="refresh-btn" id="refreshBtn" onclick="fetchAll()">🔄 به‌روزرسانی</button>
+<div class="footer">
+  <span class="ts" id="lastUpdate"><span class="dot"></span> هنوز به‌روزرسانی نشده</span>
+  <button class="btn" id="refreshBtn" onclick="fetchAll()">🔄 به‌روزرسانی</button>
 </div>
 
 <script>
-  const PROXIES = [
-    'https://api.allorigins.win/get?url=',
-    'https://corsproxy.io/?',
-  ];
+  // TGJU public API — no CORS issues
+  const TGJU_BASE = 'https://api.tgju.org/v1/market/indicator/summary-table-data/';
 
-  const URLS = {
-    digikala: '<https://dgkl.io/api/v1/Click/b/pcEUF?b64=aHR0cHM6Ly93d3cuZGlnaWthbGEuY29tL3dlYWx0aC9teS1hc3NldHMvP3V0bV9zb3VyY2U9ZGsmdXRtX21lZGl1bT11bmRlcnNlYXJjaGJ1dHRvbiZ1dG1fY2FtcGFpZ249Zml4YnV0dG9u>',
-    isignal:  'https://isignal.ir/gold-currency/usdollar/'
+  const ITEMS = {
+    gold:   { key: 'sekeb',    label: 'گرم طلا ۱۸ عیار', divisor: 1000 },  // per gram -> /1000 for mg
+    silver: { key: 'silver',   label: 'نقره', divisor: 1000 },
+    dollar: { key: 'price_dollar_rl', label: 'دلار', divisor: 1 }
   };
 
-  function fmt(n) {
-    if (!n && n !== 0) return '—';
+  let prevPrices = {};
+
+  function fa(n) {
     return Number(n).toLocaleString('fa-IR');
   }
 
-  function setPrice(id, value, raw) {
-    const el = document.getElementById(id);
-    el.textContent = value !== null ? fmt(value) : '— (یافت نشد)';
+  function setSkeletons() {
+    ['goldPrice','silverPrice','dollarPrice'].forEach(id => {
+      document.getElementById(id).innerHTML = '<div class="skeleton"></div>';
+    });
+    ['goldChange','silverChange','dollarChange'].forEach(id => {
+      document.getElementById(id).style.display = 'none';
+    });
   }
 
-  function setSource(id, text) {
-    document.getElementById(id).textContent = text;
-  }
-
-  async function fetchWithProxy(targetUrl) {
-    for (const proxy of PROXIES) {
-      try {
-        const res = await fetch(proxy + encodeURIComponent(targetUrl), { signal: AbortSignal.timeout(12000) });
-        if (!res.ok) continue;
-        const data = await res.json();
-        // allorigins wraps in {contents: "..."}
-        const html = data.contents || data;
-        if (typeof html === 'string' && html.length > 100) return html;
-      } catch(e) { /* try next */ }
+  function renderChange(elId, current, previous) {
+    const el = document.getElementById(elId);
+    if (!previous || previous === current) {
+      el.style.display = 'none';
+      return;
     }
+    const diff = current - previous;
+    const pct = ((diff / previous) * 100).toFixed(2);
+    el.style.display = 'inline-flex';
+    if (diff > 0) {
+      el.className = 'change up';
+      el.textContent = `▲ ${fa(diff)} (${pct}%)`;
+    } else {
+      el.className = 'change down';
+      el.textContent = `▼ ${fa(Math.abs(diff))} (${Math.abs(pct)}%)`;
+    }
+  }
+
+  async function fetchTGJU(key) {
+    const url = `${TGJU_BASE}${key}`;
+    const res = await fetch(url, {
+      headers: { 'Accept': 'application/json' },
+      signal: AbortSignal.timeout(10000)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  }
+
+  function extractPrice(data) {
+    // TGJU returns {data: {p: "price_string", ...}} or similar
+    try {
+      const d = data.data || data;
+      // Try common fields
+      const raw = d.p || d.price || d.last || d.value || d[0]?.p;
+      if (raw) {
+        return parseInt(String(raw).replace(/[,،\s]/g, ''));
+      }
+      // Sometimes it's nested deeper
+      if (Array.isArray(d) && d.length > 0) {
+        const v = d[0].p || d[0].price || d[0].value;
+        return parseInt(String(v).replace(/[,،\s]/g, ''));
+      }
+    } catch(e) {}
     return null;
   }
 
-  // Parse Digikala wealth page for gold & silver mg prices
-  function parseDigikala(html) {
-    const result = { gold: null, silver: null };
-    if (!html) return result;
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-
-    // Try to find JSON in script tags (Next.js __NEXT_DATA__)
-    const scripts = doc.querySelectorAll('script[type="application/json"], script#__NEXT_DATA__');
-    for (const s of scripts) {
-      try {
-        const json = JSON.parse(s.textContent);
-        const str = JSON.stringify(json);
-
-        // Look for gold price patterns (milligram)
-        const goldMatch = str.match(/"gold[^"]*"[^:]*:\s*"?([\d,]+)"?/i)
-                       || str.match(/milligram[^:]*:\s*"?([\d,]+)"?/i)
-                       || str.match(/"price"[^:]*:\s*"?([\d,]+)"?/);
-        if (goldMatch) {
-          result.gold = parseInt(goldMatch[1].replace(/,/g, ''));
-        }
-      } catch(e) {}
-    }
-
-    // Fallback: look for price numbers in text
-    const text = doc.body ? doc.body.innerText || doc.body.textContent : html;
-
-    // Pattern: numbers followed by ریال context around طلا / نقره
-    const goldCtx = text.match(/طلا[\s\S]{0,200}?([\d,]{5,})/);
-    const silverCtx = text.match(/نقره[\s\S]{0,200}?([\d,]{5,})/);
-
-    if (goldCtx && !result.gold) result.gold = parseInt(goldCtx[1].replace(/,/g,''));
-    if (silverCtx) result.silver = parseInt(silverCtx[1].replace(/,/g,''));
-
-    return result;
+  async function fetchmes it's nested deeper
+      if (Array.isArray(d) && d.length > 0) {
+        const v = d[0].p || d[0].price || d[0].value;
+        return parseInt(String(v).replace(/[,،\s]/g, ''));
+      }
+    } catch(e) {}
+    return null;
   }
 
-  // Parse iSignal dollar page
-  function parseISignal(html) {
-    if (!html) return null;
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-
-    // Try common selectors for price display
-    const selectors = [
-      '.price', '.rate', '[class*="price"]', '[class*="rate"]',
-      '[class*="value"]', 'strong', 'b', 'h2', 'h3'
-    ];
-
-    for (const sel of selectors) {
-      const els = doc.querySelectorAll(sel);
-      for (const el of els) {
-        const t = el.textContent.replace(/\s/g,'').replace(/,/g,'');
-        // Dollar price in Iran is typically 5-7 digits in Rials (e.g. 600000-800000)
-        const m = t.match(/(\d{5,7})/);
-        if (m) {
+  async function fetchback: search entire JSON for a number in plausible range
+        const str = JSON.stringify(data);
+        const matches = [...str.matchAll(/[":,\[](\d{5,8})[",\]]/g)];
+        for (const m of matches) {
           const n = parseInt(m[1]);
-          if (n > 300000 && n < 2000000) return n; // sanity range for dollar in Rials
+          if (type === 'dollar' && n > 300000 && n < 3000000) { price = n; break; }
+          if (type !== 'dollar' && n > 500000) { price = n; break; }
         }
       }
-    }
 
-    // Fallback: scan all text
-    const allNums = [...(html.matchAll(/\b(\d[\d,]{4,8})\b/g))];
-    for (const [, raw] of allNums) {
-      const n = parseInt(raw.replace(/,/g,''));
-      if (n > 300000 && n < 2000000) return n;
+      if (price) {
+        const displayPrice = item.divisor > 1 ? Math.round(price / item.divisor) : price;
+        const prev = prevPrices[type];
+        document.getElementById(priceElId).textContent = fa(displayPrice);
+        renderChange(changeElId, displayPrice, prev);
+        prevPrices[type] = displayPrice;
+        document.getElementById(timeElId).textContent =
+          `TGJU · ${new Date().toLocaleTimeString('fa-IR')}`;
+      } else {
+        document.getElementById(priceElId).textContent = '— (یافت نشد)';
+        document.getElementById(timeElId).textContent = 'پردازش داده ناموفق';
+      }
+    } catch(e) {
+      document.getElementById(priceElId).textContent = '— (خطا)';
+      document.getElementById(timeElId).textContent = 'خطا: ' + (e.message || 'نامشخص');
     }
-
-    return null;
   }
 
   async function fetchAll() {
     const btn = document.getElementById('refreshBtn');
     btn.disabled = true;
-    btn.textContent = '⏳ در حال دریافت...';
-    document.getElementById('errorBanner').style.display = 'none';
+    btn.textContent = '⏳ دریافت...';
+    setSkeletons();
 
-    // Reset to skeleton
-    ['goldPrice','silverPrice','dollarPrice'].forEach(id => {
-      document.getElementById(id).innerHTML = '<div class="skeleton"></div>';
-    });
+    await Promise.all([
+      fetchSingle('gold',   'goldPrice',   'goldTime',   'goldChange'),
+      fetchSingle('silver', 'silverPrice', 'silverTime', 'silverChange'),
+      fetchSingle('dollar', 'dollarPrice', 'dollarTime', 'dollarChange'),
+    ]);
 
-    let errors = [];
-
-    // --- Digikala ---
-    try {
-      const html = await fetchWithProxy(URLS.digikala);
-      if (html) {
-        const { gold, silver } = parseDigikala(html);
-        setPrice('goldPrice', gold);
-        setPrice('silverPrice', silver);
-        setSource('goldSource', gold ? `دیجی‌کالا · ${new Date().toLocaleTimeString('fa-IR')}` : 'پارس داده ناموفق بود');
-        setSource('silverSource', silver ? `دیجی‌کالا · ${new Date().toLocaleTimeString('fa-IR')}` : 'پارس داده ناموفق بود');
-      } else {
-        setPrice('goldPrice', null);
-        setPrice('silverPrice', null);
-        setSource('goldSource', 'خطا در اتصال');
-        setSource('silverSource', 'خطا در اتصال');
-        errors.push('دیجی‌کالا');
-      }
-    } catch(e) {
-      setPrice('goldPrice', null);
-      setPrice('silverPrice', null);
-      errors.push('دیجی‌کالا: ' + e.message);
-    }
-
-    // --- iSignal ---
-    try {
-      const html = await fetchWithProxy(URLS.isignal);
-      if (html) {
-        const dollar = parseISignal(html);
-        setPrice('dollarPrice', dollar);
-        setSource('dollarSource', dollar ? `iSignal · ${new Date().toLocaleTimeString('fa-IR')}` : 'پارس داده ناموفق بود');
-      } else {
-        setPrice('dollarPrice', null);
-        setSource('dollarSource', 'خطا در اتصال');
-        errors.push('iSignal');
-      }
-    } catch(e) {
-      setPrice('dollarPrice', null);
-      errors.push('iSignal: ' + e.message);
-    }
-
-    // Update status
-    const now = new Date().toLocaleString('fa-IR');
-    document.getElementById('lastUpdate').textContent = 'آخرین به‌روزرسانی: ' + now;
-
-    if (errors.length) {
-      const banner = document.getElementById('errorBanner');
-      banner.style.display = 'block';
-      banner.innerHTML = `⚠️ مشکل در دریافت از: ${errors.join(' · ')}<br><small>این سایت‌ها ممکن است CORS یا bot protection داشته باشند. برای استفاده پایدار یک backend کوچک (مثلاً Node.js یا Python + BeautifulSoup) پیشنهاد می‌شود.</small>`;
-    }
+    document.getElementById('lastUpdate').innerHTML =
+      `<span class="dot"></span> آخرین به‌روزرسانی: ${new Date().toLocaleString('fa-IR')}`;
 
     btn.disabled = false;
     btn.textContent = '🔄 به‌روزرسانی';
   }
 
-  // Auto-fetch on load
   fetchAll();
-
-  // Auto-refresh every 60 seconds
   setInterval(fetchAll, 60000);
 </script>
-
 </body>
 </html>
