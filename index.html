@@ -11,13 +11,19 @@
   --border: oklch(91% 0.006 255);
   --text: oklch(16% 0.016 255);
   --muted: oklch(53% 0.010 255);
-  --gold: oklch(63% 0.150 70);
+  --gold-c: oklch(63% 0.150 70);
   --gold-bg: oklch(97% 0.022 70);
-  --silver: oklch(47% 0.011 255);
+  --silver-c: oklch(47% 0.011 255);
   --silver-bg: oklch(96% 0.006 255);
-  --accent: oklch(51% 0.142 148);
-  --accent-bg: oklch(96% 0.036 148);
-  --danger: oklch(51% 0.162 25);
+  --usd-c: oklch(51% 0.142 148);
+  --usd-bg: oklch(96% 0.036 148);
+  --up: oklch(46% 0.14 148);
+  --up-bg: oklch(94% 0.045 148);
+  --dn: oklch(50% 0.16 25);
+  --dn-bg: oklch(95% 0.048 25);
+  --warn-bg: oklch(97% 0.022 80);
+  --warn-border: oklch(86% 0.08 80);
+  --warn-text: oklch(38% 0.12 60);
   --r: 14px;
 }
 @media (prefers-color-scheme: dark) {
@@ -27,13 +33,19 @@
     --border: oklch(27% 0.007 255);
     --text: oklch(93% 0.004 255);
     --muted: oklch(59% 0.008 255);
-    --gold: oklch(73% 0.138 70);
+    --gold-c: oklch(73% 0.138 70);
     --gold-bg: oklch(21% 0.028 70);
-    --silver: oklch(69% 0.009 255);
+    --silver-c: oklch(69% 0.009 255);
     --silver-bg: oklch(21% 0.005 255);
-    --accent: oklch(66% 0.128 148);
-    --accent-bg: oklch(19% 0.038 148);
-    --danger: oklch(66% 0.138 25);
+    --usd-c: oklch(66% 0.128 148);
+    --usd-bg: oklch(19% 0.038 148);
+    --up: oklch(62% 0.13 148);
+    --up-bg: oklch(20% 0.055 148);
+    --dn: oklch(65% 0.13 25);
+    --dn-bg: oklch(20% 0.055 25);
+    --warn-bg: oklch(19% 0.028 70);
+    --warn-border: oklch(32% 0.09 65);
+    --warn-text: oklch(72% 0.10 65);
   }
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -42,377 +54,194 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  padding: 36px 16px 56px;
+  padding: 40px 16px 60px;
 }
-.wrap { max-width: 880px; margin: 0 auto; }
-h1 {
-  text-align: center;
-  font-size: clamp(1.25rem, 3vw, 1.6rem);
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  margin-bottom: 4px;
+.wrap { max-width: 900px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 28px; }
+h1 { font-size: clamp(1.3rem, 3vw, 1.7rem); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+.subtitle { font-size: .82rem; color: var(--muted); margin-bottom: 4px; }
+.src-tag {
+  display: inline-block;
+  font-size: .72rem; color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 2px 10px; border-radius: 20px;
+  min-width: 120px;
+  transition: opacity .2s;
 }
-.sub {
-  text-align: center;
-  color: var(--muted);
-  font-size: .82rem;
-  margin-bottom: 6px;
+
+/* notice */
+.notice {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: .78rem; color: var(--warn-text);
+  line-height: 1.65;
+  margin-bottom: 20px;
 }
-.src-line {
-  text-align: center;
-  font-size: .72rem;
-  color: var(--muted);
-  min-height: 1.1rem;
-  margin-bottom: 28px;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
-}
+.notice strong { display: block; margin-bottom: 2px; }
+
+/* grid */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 24px; }
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  padding: 22px 18px 16px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 14px rgba(0,0,0,.05);
-  transition: transform .15s ease, box-shadow .15s ease;
+  padding: 20px 18px 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 3px 12px rgba(0,0,0,.05);
+  transition: transform .15s, box-shadow .15s;
+  position: relative; overflow: hidden;
 }
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0,0,0,.06), 0 8px 20px rgba(0,0,0,.08);
-}
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  border-radius: var(--r) var(--r) 0 0;
-}
-.card.gold::before   { background: var(--gold); }
-.card.silver::before { background: var(--silver); }
-.card.dollar::before { background: var(--accent); }
+.card:hover { transform: translateY(-2px); box-shadow: 0 3px 6px rgba(0,0,0,.07), 0 10px 22px rgba(0,0,0,.08); }
+.card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: var(--r) var(--r) 0 0; }
+.card.gold::before   { background: var(--gold-c); }
+.card.silver::before { background: var(--silver-c); }
+.card.usd::before    { background: var(--usd-c); }
 .ico {
-  width: 42px; height: 42px;
-  border-radius: 10px;
+  width: 44px; height: 44px; border-radius: 11px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.25rem;
-  margin-bottom: 12px;
+  font-size: 1.3rem; margin-bottom: 14px;
 }
-.gold .ico   { background: var(--gold-bg); }
-.silver .ico { background: var(--silver-bg); }
-.dollar .ico { background: var(--accent-bg); }
-.lbl { font-size: .76rem; color: var(--muted); font-weight: 500; margin-bottom: 8px; }
-.price-row { display: flex; align-items: baseline; gap: 5px; min-height: 2.1rem; }
-.price { font-size: .76rem; color: var(--muted); font-weight: 500; margin-bottom: 8px; }
-.price-row { display: flex; align-items: baseline; gap: 5px; min-height: 2.1rem; }
-.price {r: var(--silver); }
-.dollar .price { color: var(--accent); }
-.unit { font-size: .72rem; color: var(--muted); padding-bottom: 2px; }
+.card.gold .ico   { background: var(--gold-bg); }
+.card.silver .ico { background: var(--silver-bg); }
+.card.usd .ico    { background: var(--usd-bg); }
+.label { font-size: .75rem; color: var(--muted); font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .04em; }
+.price-row { display: flex; align-items: baseline; gap: 6px; min-height: 2.2rem; }
+.price { font-size: 1.6rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.card.gold .price   { color: var(--gold-c); }
+.card.silver .price { color: var(--silver-c); }
+.card.usd .price    { color: var(--usd-c); }
+.unit { font-size: .72rem; color: var(--muted); }
 .badge {
-  display: inline-flex; align-items: center; gap: 2px;
-  font-size: .68rem; font-weight: 600;
-  padding: 2px 7px; border-radius: 20px;
-  margin-top: 6px;
-  visibility: hidden;
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: .68rem; font-weight: 700;
+  padding: 3px 8px; border-radius: 20px; margin-top: 8px;
+  opacity: 0; transition: opacity .2s;
 }
-.badge.show { visibility: visible; }
-.badge.up { background: oklch(92% .048 148); color: var(--accent); }
-.badge.dn { background: oklch(95% .048 25);  color: var(--danger); }
-@media (prefers-color-scheme: dark) {
-  .badge.up { background: oklch(22% .058 148); }
-  .badge.dn { background: oklch(22% .058 25); }
-}
-.sep { height: 1px; background: var(--border); margin: 12px 0 8px; }
-.meta { font-size: .7rem; color: var(--muted); min-height: 1rem; }
+.badge.visible { opacity: 1; }
+.badge.up { background: var(--up-bg); color: var(--up); }
+.badge.dn { background: var(--dn-bg); color: var(--dn); }
+.divider { height: 1px; background: var(--border); margin: 12px 0 8px; }
+.time { font-size: .7rem; color: var(--muted); }
+
+/* skeleton */
 .sk {
-  display: inline-block; width: 115px; height: 1.85rem;
+  display: inline-block; width: 110px; height: 1.7rem;
   background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
+  animation: sh 1.4s infinite;
   border-radius: 6px; vertical-align: bottom;
 }
-@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
-@media (prefers-reduced-motion: reduce) { .sk, .dot { animation: none; } }
-.footer {
-  display: flex; align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap; gap: 12px;
-}
-.ts { font-size: .76rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-.dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--accent);
-  animation: pulse 2s infinite;
-}
+@keyframes sh { from{background-position:200% 0} to{background-position:-200% 0} }
+@media (prefers-reduced-motion: reduce) { .sk { animation: none; } }
+
+/* footer */
+.footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.ts { font-size: .76rem; color: var(--muted); display: flex; align-items: center; gap: 7px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--usd-c); animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+@media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
 .btn {
-  background: var(--accent); color: oklch(98% 0 0);
+  background: var(--usd-c); color: #fff;
   border: none; border-radius: 9px;
   padding: 10px 22px;
-  font-size: .83rem; font-weight: 600; font-family: inherit;
-  cursor: pointer;
-  display: flex; align-items: center; gap: 6px;
+  font-size: .83rem; font-weight: 700; font-family: inherit;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
   transition: opacity .15s, transform .1s;
 }
 .btn:hover { opacity: .85; }
 .btn:active { transform: scale(.97); }
-.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.btn:focus-visible { outline: 2px solid var(--usd-c); outline-offset: 3px; }
 .btn:disabled { opacity: .4; cursor: not-allowed; }
-#errBox {
-  background: oklch(97% .022 25);
-  border: 1px solid oklch(88% .055 25);
-  border-radius: 10px;
-  padding: 14px 16px;
-  font-size: .8rem; color: oklch(36% .115 25);
-  line-height: 1.7;
-  margin-bottom: 20px;
-  display: none;
+
+/* error */
+.err {
+  background: var(--dn-bg); border: 1px solid oklch(82% .07 25);
+  border-radius: 10px; padding: 14px 16px;
+  font-size: .8rem; color: var(--dn); line-height: 1.7;
+  margin-bottom: 20px; display: none;
 }
-@media (prefers-color-scheme: dark) {
-  #errBox {
-    background: oklch(20% .038 25);
-    border-color: oklch(31% .075 25);
-    color: oklch(73% .115 25);
-  }
-}
+.err code { font-size: .76rem; background: var(--bg); padding: 1px 5px; border-radius: 4px; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>📊 قیمت لحظه‌ای بازار</h1>
-  <p class="sub">طلا · نقره · دلار — به‌روزرسانی خودکار هر ۶۰ ثانیه</p>
-  <p class="src-line" id="srcLine"></p>
-  <div id="errBox" role="alert"></div>
+  <div class="header">
+    <h1>📊 قیمت لحظه‌ای بازار</h1>
+    <p class="subtitle">طلا ۱۸ عیار · نقره · دلار — به‌روزرسانی هر ۶۰ ثانیه</p>
+    <span class="src-tag" id="srcTag">در حال اتصال...</span>
+  </div>
+
+  <div class="err" id="errBox" role="alert"></div>
+
   <div class="grid">
-    <div class="card gold">
+    <div class="card gold" role="region" aria-label="قیمت طلا">
       <div class="ico" aria-hidden="true">🥇</div>
-      <div class="lbl">هر میلی‌گرم طلا ۱۸ عیار</div>
+      <div class="label">هر میلی‌گرم طلا ۱۸ عیار</div>
       <div class="price-row">
         <span class="price" id="gp" aria-live="polite"><span class="sk"></span></span>
         <span class="unit">ریال</span>
       </div>
       <div class="badge" id="gb" aria-live="polite"></div>
-      <div class="sep"></div>
-      <div class="meta" id="gm">در حال دریافت...</div>
+      <div class="divider"></div>
+      <div class="time" id="gt">—</div>
     </div>
-    <div class="card silver">
+
+    <div class="card silver" role="region" aria-label="قیمت نقره">
       <div class="ico" aria-hidden="true">🥈</div>
-      <div class="lbl">هر میلی‌گرم نقره</div>
+      <div class="label">هر میلی‌گرم نقره</div>
       <div class="price-row">
         <span class="price" id="sp" aria-live="polite"><span class="sk"></span></span>
         <span class="unit">ریال</span>
       </div>
       <div class="badge" id="sb" aria-live="polite"></div>
-      <div class="sep"></div>
-      <div class="meta" id="sm">در حال دریافت...</div>
+      <div class="divider"></div>
+      <div class="time" id="st">—</div>
     </div>
-    <div class="card dollar">
+
+    <div class="card usd" role="region" aria-label="قیمت دلار">
       <div class="ico" aria-hidden="true">💵</div>
-      <div class="lbl">دلار آمریکا (بازار آزاد)</div>
+      <div class="label">دلار آمریکا — بازار آزاد</div>
       <div class="price-row">
         <span class="price" id="dp" aria-live="polite"><span class="sk"></span></span>
         <span class="unit">ریال</span>
       </div>
       <div class="badge" id="db" aria-live="polite"></div>
-      <div class="sep"></div>
-      <div class="meta" id="dm">در حال دریافت...</div>
+      <div class="divider"></div>
+      <div class="time" id="dt">—</div>
     </div>
   </div>
+
   <div class="footer">
     <div class="ts">
       <span class="dot" aria-hidden="true"></span>
-      <span id="ts">هنوز به‌روزرسانی نشده</span>
+      <span id="lastUpdate">هنوز به‌روز نشده</span>
     </div>
-    <button class="btn" id="refreshBtn" onclick="fetchAll()">🔄 به‌روزرسانی</button>
+    <button class="btn" id="refreshBtn" onclick="boot()">🔄 به‌روزرسانی</button>
   </div>
 </div>
 
 <script>
-var prevVals = {};
-var autoTimer = null;
-var INTERVAL = 60000;
+// ─── state ────────────────────────────────────────────────────────────────────
+var prev = {};
+var timer = null;
+var TICK = 60000;
 
-function fmt(n) {
-  return Number(n).toLocaleString('fa-IR');
-}
-function nowStr() {
-  return new Date().toLocaleTimeString('fa-IR');
-}
-function setLoading() {
-  ['g','s','d'].forEach(function(k) {
-    document.getElementById(k+'p').innerHTML = '<span class="sk"></span>';
-    document.getElementById(k+'b').className = 'badge';
-    document.getElementById(k+'m').textContent = 'در حال دریافت...';
-  });
-  document.getElementById('errBox').style.display = 'none';
-  document.getElementById('srcLine').textContent = '';
-  document.getElementById('refreshBtn').disabled = true;
-}
-function renderCard(key, val) {
-  var pv = prevVals[key];
-  prevVals[key] = val;
-  document.getElementById(key+'p').textContent = fmt(val);
-  document.getElementById(key+'m').textContent = nowStr();
-  var badge = document.getElementById(key+'b');
-  if (pv !== undefined && pv !== val) {
-    var d = val - pv;
-    var pct = Math.abs(d / pv * 100).toFixed(2);
-    badge.className = 'badge show ' + (d > 0 ? 'up' : 'dn');
-    badge.textContent = (d > 0 ? '▲ ' : '▼ ') + fmt(Math.abs(d)) + ' (' + pct + '%)';
-  } else {
-    badge.className = 'badge';
-  }
-}
-function renderFail(key) {
-  document.getElementById(key+'p').textContent = '—';
-  document.getElementById(key+'m').textContent = 'داده دریافت نشد';
-}
-function showErr(html) {
-  var el = document.getElementById('errBox');
-  el.innerHTML = html;
-  el.style.display = 'block';
+// ─── helpers ──────────────────────────────────────────────────────────────────
+function farsi(n) { return Number(n).toLocaleString('fa-IR'); }
+function now()    { return new Date().toLocaleTimeString('fa-IR'); }
+
+function setEl(id, html, isText) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  if (isText) el.textContent = html; else el.innerHTML = html;
 }
 
-// ─── CORS proxy: adds Access-Control headers, works from file:// too ───────
-function proxied(url) {
-  var p = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
-  return fetch(p, { signal: AbortSignal.timeout(13000) })
-    .then(function(r) {
-      if (!r.ok) throw new Error('proxy ' + r.status);
-      return r.json();
-    })
-    .then(function(j) {
-      if (!j || !j.contents) throw new Error('proxy empty');
-      return JSON.parse(j.contents);
-    });
-}
-
-// ─── Helper: pull numeric price out of TGJU's varied response shapes ────────
-function parseTGJU(data) {
-  if (!data) return null;
-  // shape 1: {data:{p:"1,234,567"}}
-  var d = data.data || data;
-  var raw = null;
-  if (d && d.p) {
-    raw = d.p;
-  } else {
-    // shape 2: nested somewhere — do a string search
-    var m = JSON.stringify(data).match(/"p"\s*:\s*"?([\d,]+)"?/);
-    if (m) raw = m[1];
-  }
-  if (!raw) return null;
-  return parseInt(String(raw).replace(/[^0-9]/g, ''), 10) || null;
-}
-
-// ─── Source A: tgju.org ─────────────────────────────────────────────────────
-function fromTGJU() {
-  var urls = {
-    g: 'https://api.tgju.org/v1/market/indicator/summary-table-data/sekeb',
-    s: 'https://api.tgju.org/v1/market/indicator/summary-table-data/silver',
-    d: 'https://api.tgju.org/v1/market/indicator/summary-table-data/price_dollar_rl'
-  };
-  var jobs = Object.keys(urls).map(function(k) {
-    return proxied(urls[k])
-      .then(function(data) { return { k: k, data: data }; })
-      .catch(function() { return { k: k, data: null }; });
-  });
-  return Promise.all(jobs).then(function(results) {
-    var gold = null, silver = null, dollar = null;
-    results.forEach(function(r) {
-      var v = parseTGJU(r.da(r) {
-      var v = parseTGJU(r.data);
-      if (!v) return;
-      if (r.k === 'g') gold   = Math.round(v / 1000);
-      if (r.k === 's') silver = Math.round(v / 1000);
-      if (if (!gold && !silver && !dollar) throw new Error('tgju: no data');
-    return { gold: gold, silver: silver, dollar: dollar, src: 'tgju.org' };
-  });
-}
-
-// ─── Source B: navasan.tech ──────────────────────────────────────────────────
-function fromNavasan() {
-  var url = 'https://navasan.tech/api/?api_key=free&item=gold_18,silver,usd_buy';
-  return proxied(url).then(function(data) {
-    var gold = null, silver = null, dollar = null;
-    var items = Array.isArray(data) ? data : Object.values(data);
-    items.forEach(function(item) {
-      if (!item) return;
-      var raw = item.value || item.price || item.p || '';
-      var v = parseInt(String(raw).replace(/[^0-9]/g, ''), 10);
-      if (!v) return;
-      var slug = String(item.slug || item.name || item.title || '').toLowerCase();
-      if (slug.indexOf('gold') !== -1 || slug.indexOf('طلا') !== -1)   gold   = Math.round(v / 1000);
-      else if (slug.indexOf('silver') !== -1 || slug.indexOf('نقره') !== -1) silver = Math.round(v / 1000);
-      else if (slug.indexOf('usd') !== -1 || slug.indexOf('دلار') !== -1)    dollar = v;
-    });
-    if (!gold && !silver && !dollar) throw new Error('navasan: no data');
-    return { gold: gold, silver: silver, dollar: dollar, src: 'navasan.tech' };
-  });
-}
-
-// ─── Source C: alanchand.com ─────────────────────────────────────────────────
-function fromAlanChand() {
-  var url = 'https://alanchand.com/api/gold-price';
-  return proxied(url).then(function(data) {
-    var gold = null, silver = null, dollar = null;
-    var src = data.result || data.data || data;
-    if (Array.isArray(src)) {
-      src.forEach(function(item) {
-        var v = parseInt(String(item.price || item.value || '').replace(/[^0-9]/g,''), 10);
-        if (!v) return;
-        var t = String(item.type || item.name || item.slug || '').toLowerCase();
-        if (t.indexOf('18') !== -1 && (t.indexOf('gold') !== -1 || t.indexOf('طلا') !== -1)) gold = Math.round(v / 1000);
-        else if (t.indexOf('silver') !== -1 || t.indexOf('نقره') !== -1) silver = Math.round(v / 1000);
-        else if (t.indexOf('usd') !== -1 || t.indexOf('dollar') !== -1 || t.indexOf('دلار') !== -1) dollar = v;
-      });
-    }
-    if (!gold && !silver && !dollar) throw new Error('alanchand: no data');
-    return { gold: gold, silver: silver, dollar: dollar, src: 'alanchand.com' };
-  });
-}
-
-// ─── Fetch with ordered fallback ─────────────────────────────────────────────
-function fetchWithFallback() {
-  return fromTGJU()
-    .catch(function() { return fromNavasan(); })
-    .catch(function() { return fromAlanChand(); });
-}
-
-// ─── Main entry ──────────────────────────────────────────────────────────────
-function fetchAll() {
-  setLoading();
-  if (autoTimer) clearTimeout(autoTimer);
-
-  fetchWithFallback()
-    .then(function(res) {
-      if (res.gold)   renderCard('g', res.gold);   else renderFail('g');
-      if (res.silver) renderCard('s', res.silver); else renderFail('s');
-      if (res.dollar) renderCard('d', res.dollar); else renderFail('d');
-
-      document.getElementById('srcLine').textContent = 'منبع: ' + res.src;g','s','d'].forEach(renderFail);
-      document.getElementById‌روزرسانی: ' + nowStr();
-      document.getElementById('refreshBtn').disabled = false;
-
-      autoTimer = setTimeout(fetchAll, INTERVAL);
-    })
-    .catch(function(err) {
-      ['g','s','d'].forEach(renderFail);
-      document.getElementById('refreshBtn').disabled = false;
-      showErr(
-        '<strong>⚠️ خطا در دریافت داده از همه منابع</strong><br>' +
-        'جزئیات: ' + err.message + '<br><br>' +
-        'اگر فایل را مستقیم باز کرده‌اید، لطفاً آن را روی یک سرور اجرا کنید:<br>' +
-        '<code>python -m http.server 8080</code>'
-      );
-      autoTimer = setTimeout(fetchAll, INTERVAL);
-    });
-}
-
-fetchAll();
-</script>
-</body>
-</html>
+function badge(key, val) {
+  var p = prev[key];
+  prev[key] = val;
+  var el = document.getElementById(key + 'b');
+  if (!el) return;
+  if (p === undefined || p === val) { el.cl
